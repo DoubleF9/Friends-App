@@ -1,6 +1,11 @@
 ﻿using ApiApp.Models;
+using ApiApp.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,8 +16,7 @@ namespace ApiApp.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppDbContext _context;
-        // Static variable to hold the ID of the currently logged-in user
-        private static int? _currentUserId = null;
+
 
         public UsersController(AppDbContext context)
         {
@@ -21,10 +25,15 @@ namespace ApiApp.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] User user)
+        public async Task<IActionResult> Register([FromBody] UserDto userDto)
         {
             try
             {
+                var user = new User
+                {
+                    Email = userDto.Email,
+                    Password = userDto.Password,
+                };
                 if (await _context.Users.AnyAsync(u => u.Email == user.Email))
                 {
                     return BadRequest("Email already exists.");
@@ -62,7 +71,7 @@ namespace ApiApp.Controllers
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] User loginRequest)
+        public async Task<IActionResult> Login([FromBody] UserDto loginRequest)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginRequest.Email);
             if (user == null || !VerifyPassword(loginRequest.Password, user.Password))
@@ -70,12 +79,26 @@ namespace ApiApp.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            user.IsLogged = true;
-            await _context.SaveChangesAsync();
+            // Generate JWT Token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes("YourSuperSecretKeyThatIsAtLeast32BytesLong"); // Use the same key as in appsettings.json
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email)
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = "YourAppName", // Use the same issuer as in appsettings.json
+                Audience = "YourAppName", // Use the same audience as in appsettings.json
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
 
-            _currentUserId = user.Id;
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok("Login successful.");
+            return Ok(tokenString);
         }
 
 
@@ -98,20 +121,27 @@ namespace ApiApp.Controllers
         }
 
         // Save profile data
+        [Authorize]
         [HttpPost("saveprofile")]
-        public async Task<IActionResult> SaveProfile([FromBody] Profile updatedProfile)
+        public async Task<IActionResult> SaveProfile([FromBody] ProfileDto updatedProfile)
         {
-            // Check if a user is logged in
-            if (_currentUserId == null)
+            // Extract the user ID from the JWT token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
             {
-                return Unauthorized("No user is currently logged in.");
+                return Unauthorized("Invalid token. User ID not found.");
+            }
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized("Invalid user ID in token.");
             }
 
             // Get the logged-in user
-            var user = await _context.Users.Include(u => u.Profile).FirstOrDefaultAsync(u => u.Id == _currentUserId);
+            var user = await _context.Users.Include(u => u.Profile).FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
-                return Unauthorized("You are not authorized to update this profile.");
+                return NotFound("User not found.");
             }
 
             // Check if the profile exists
@@ -130,9 +160,6 @@ namespace ApiApp.Controllers
 
             return Ok("Profile updated successfully.");
         }
-
-
-
 
         private string HashPassword(string password)
         {
