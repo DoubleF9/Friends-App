@@ -68,8 +68,6 @@ namespace ApiApp.Controllers
             }
         }
 
-
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserDto loginRequest)
         {
@@ -81,7 +79,7 @@ namespace ApiApp.Controllers
 
             // Generate JWT Token
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes("YourSuperSecretKeyThatIsAtLeast32BytesLong"); // Use the same key as in appsettings.json
+            var key = Encoding.UTF8.GetBytes("abcdefghijklmnopqrstuvxyz123456789"); 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -90,8 +88,8 @@ namespace ApiApp.Controllers
                     new Claim(ClaimTypes.Email, user.Email)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = "YourAppName", // Use the same issuer as in appsettings.json
-                Audience = "YourAppName", // Use the same audience as in appsettings.json
+                Issuer = "App", 
+                Audience = "App", 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -100,7 +98,6 @@ namespace ApiApp.Controllers
 
             return Ok(tokenString);
         }
-
 
         [HttpGet("getprofile/{userId}")]
         public async Task<IActionResult> GetProfile(int userId)
@@ -181,7 +178,6 @@ namespace ApiApp.Controllers
             // Combine the salt and hash into a single string (salt is always 16 bytes)
             return salt + Convert.ToBase64String(hash);
         }
-
 
         private bool VerifyPassword(string inputPassword, string storedHash)
         {
