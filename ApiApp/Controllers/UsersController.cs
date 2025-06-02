@@ -77,7 +77,7 @@ namespace ApiApp.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            // Generate JWT Token
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes("abcdefghijklmnopqrstuvxyz123456789"); 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -87,7 +87,7 @@ namespace ApiApp.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email)
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddSeconds(10000),
                 Issuer = "App", 
                 Audience = "App", 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -132,6 +132,15 @@ namespace ApiApp.Controllers
             if (!int.TryParse(userIdClaim.Value, out int userId))
             {
                 return Unauthorized("Invalid user ID in token.");
+            }
+
+            DateTime currentTime = DateTime.UtcNow;
+            Claim? exp = User.Claims.FirstOrDefault(c => c.Type == "exp");
+            //DateTime expireTime = new DateTime(exp.Value.ToString());
+            DateTimeOffset timeOffset = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp?.Value));
+            if (DateTime.Now > timeOffset.ToLocalTime())
+            {
+                return Unauthorized("Unauthorized user");
             }
 
             // Get the logged-in user
