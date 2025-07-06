@@ -1,0 +1,78 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h2>User Profile</h2>
+    <div class="user-info" *ngIf="currentUser">
+      <p><strong>Welcome:</strong> {{ currentUser.email }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="loading">
+    Loading profile...
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading()">
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input 
+        type="text" 
+        id="firstName" 
+        formControlName="firstName" 
+        placeholder="Enter your first name"
+      >
+      <div *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" class="error">
+        First name is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input 
+        type="text" 
+        id="lastName" 
+        formControlName="lastName" 
+        placeholder="Enter your last name"
+      >
+      <div *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched" class="error">
+        Last name is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dateOfBirth">Date of Birth</label>
+      <input 
+        type="date" 
+        id="dateOfBirth" 
+        formControlName="dateOfBirth" 
+        placeholder="Select your date of birth"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="profilePicture">Profile Picture URL</label>
+      <input 
+        type="url" 
+        id="profilePicture" 
+        formControlName="profilePicture" 
+        placeholder="Enter profile picture URL (optional)"
+      >
+    </div>
+
+    <div *ngIf="successMessage" class="alert success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert error">
+      {{ errorMessage }}
+    </div>
+
+    <div class="button-group">
+      <button type="submit" [disabled]="profileForm.invalid || loading()" class="save-btn">
+        {{ loading() ? 'Saving...' : 'Save Profile' }}
+      </button>
+      
+      <button type="button" (click)="logout()" class="logout-btn">
+        Logout
+      </button>
+    </div>
+  </form>
+</div>

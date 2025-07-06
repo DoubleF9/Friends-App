@@ -63,6 +63,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Add CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:4200")  // Angular dev server default port
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
+
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -73,6 +88,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAngularOrigins");
 // Enable Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
