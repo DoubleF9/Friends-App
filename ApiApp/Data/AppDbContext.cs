@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Profile> Profiles { get; set; }
+    public DbSet<Friend> Friends { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -16,5 +17,12 @@ public class AppDbContext : DbContext
             .HasOne(u => u.Profile)
             .WithOne(p => p.User)
             .HasForeignKey<Profile>(p => p.UserId);
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Friends)
+            .WithOne(f => f.User)
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

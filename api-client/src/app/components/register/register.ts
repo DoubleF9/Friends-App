@@ -1,16 +1,15 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
-import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.html',
   styleUrls: ['./register.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule, RouterLink]
 })
 export class Register {
   registerForm: FormGroup;
@@ -53,15 +52,14 @@ export class Register {
     this.authService.register(email, password)
       .subscribe({
         next: () => {
-          this.loading = false; // Explicitly set loading to false
+          this.loading = false;
           console.log('Registration successful, redirecting to login');
-          this.router.navigate(['/login']); // Navigate directly to login
+          this.router.navigate(['/login']);
         },
         error: (error) => {
-          this.loading = false; // Ensure loading is reset on error
+          this.loading = false;
           console.error('Registration error:', error);
           
-          // Handle different error formats
           if (typeof error.error === 'string') {
             this.errorMessage = error.error;
           } else if (error.error?.message) {
@@ -73,7 +71,7 @@ export class Register {
           }
         },
         complete: () => {
-          this.loading = false; // Also handle completion
+          this.loading = false;
         }
       });
   }

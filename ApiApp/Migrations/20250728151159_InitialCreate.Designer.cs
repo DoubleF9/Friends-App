@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250602143244_migjwt")]
-    partial class migjwt
+    [Migration("20250728151159_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,36 @@ namespace ApiApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ApiApp.Models.Friend", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Friends");
+                });
 
             modelBuilder.Entity("ApiApp.Models.Profile", b =>
                 {
@@ -73,6 +103,17 @@ namespace ApiApp.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("ApiApp.Models.Friend", b =>
+                {
+                    b.HasOne("ApiApp.Models.User", "User")
+                        .WithMany("Friends")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ApiApp.Models.Profile", b =>
                 {
                     b.HasOne("ApiApp.Models.User", "User")
@@ -86,6 +127,8 @@ namespace ApiApp.Migrations
 
             modelBuilder.Entity("ApiApp.Models.User", b =>
                 {
+                    b.Navigation("Friends");
+
                     b.Navigation("Profile");
                 });
 #pragma warning restore 612, 618

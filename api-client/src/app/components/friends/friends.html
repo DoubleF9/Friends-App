@@ -1,0 +1,174 @@
+<div class="friends-container">
+  <div class="friends-header">
+    <h2>My Friends</h2>
+    <button class="add-btn" (click)="showAddFriendForm()">
+      <span class="icon">+</span> Add Friend
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <form [formGroup]="searchForm" class="search-form">
+      <div class="search-input-group">
+        <input 
+          type="text" 
+          formControlName="search" 
+          placeholder="Search friends by name..."
+          class="search-input"
+        >
+        <button 
+          type="button" 
+          class="clear-search-btn" 
+          (click)="clearSearch()"
+          *ngIf="searchTerm()"
+        >
+          ✕
+        </button>
+      </div>
+    </form>
+    <div *ngIf="searchLoading()" class="search-loading">
+      Searching...
+    </div>
+  </div>
+
+  <!-- Pagination Info -->
+  <div class="pagination-info" *ngIf="!loading() && friends().length > 0">
+    {{ getPaginationInfo() }}
+    <span *ngIf="isSearchActive()" class="search-indicator">
+      (Search: "{{ searchTerm() }}")
+    </span>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage()" class="alert success">
+    {{ successMessage() }}
+  </div>
+  <div *ngIf="errorMessage()" class="alert error">
+    {{ errorMessage() }}
+  </div>
+
+  <!-- Add/Edit Friend Form -->
+  <div *ngIf="showAddForm()" class="add-friend-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ editingFriend() ? 'Edit Friend' : 'Add New Friend' }}</h3>
+        <button class="close-btn" (click)="hideAddForm()">✕</button>
+      </div>
+      
+      <form [formGroup]="addFriendForm" (ngSubmit)="onSubmitFriend()">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            formControlName="firstName" 
+            placeholder="Enter first name"
+          >
+          <div *ngIf="addFriendForm.get('firstName')?.invalid && addFriendForm.get('firstName')?.touched" class="error">
+            First name is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            formControlName="lastName" 
+            placeholder="Enter last name"
+          >
+          <div *ngIf="addFriendForm.get('lastName')?.invalid && addFriendForm.get('lastName')?.touched" class="error">
+            Last name is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phoneNumber" 
+            formControlName="phoneNumber" 
+            placeholder="Enter phone number"
+          >
+          <div *ngIf="addFriendForm.get('phoneNumber')?.invalid && addFriendForm.get('phoneNumber')?.touched" class="error">
+            Phone number is required.
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="hideAddForm()">
+            Cancel
+          </button>
+          <button type="submit" class="save-btn" [disabled]="addFriendForm.invalid">
+            {{ editingFriend() ? 'Update' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Friends Grid -->
+  <div class="friends-content">
+    <div *ngIf="loading()" class="loading">
+      Loading friends...
+    </div>
+
+    <div *ngIf="!loading() && friends().length === 0" class="no-friends">
+      <div class="no-friends-message">
+        <span class="icon">👥</span>
+        <h3>{{ isSearchActive() ? 'No friends found' : 'No friends yet' }}</h3>
+        <p>{{ isSearchActive() ? 'Try a different search term' : 'Add your first friend to get started!' }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="!loading() && friends().length > 0" class="friends-grid">
+      <div class="friend-card" *ngFor="let friend of friends()">
+        <div class="friend-info">
+          <div class="friend-avatar">
+            {{ friend.firstName.charAt(0) }}{{ friend.lastName.charAt(0) }}
+          </div>
+          <div class="friend-details">
+            <h4>{{ friend.firstName }} {{ friend.lastName }}</h4>
+            <p class="phone">{{ friend.phoneNumber }}</p>
+          </div>
+        </div>
+        <div class="friend-actions">
+          <button class="edit-btn" (click)="editFriend(friend)" title="Edit">
+            ✏️
+          </button>
+          <button class="delete-btn" (click)="deleteFriend(friend)" title="Delete">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading() && totalPages() > 1" class="pagination">
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage() === 1"
+        (click)="onPageChange(currentPage() - 1)"
+      >
+        Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPaginationPages()" 
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="onPageChange(page)"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage() === totalPages()"
+        (click)="onPageChange(currentPage() + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

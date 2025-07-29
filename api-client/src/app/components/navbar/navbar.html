@@ -1,1 +1,11 @@
-<p>navbar works!</p>
+<nav class="navbar">
+  <div class="nav-brand">
+    <h3>API Client</h3>
+  </div>
+  
+  <ul class="nav-links">
+    <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
+    <li><a routerLink="/friends" routerLinkActive="active">Friends</a></li>
+    <li><button class="logout-btn" (click)="logout()">Logout</button></li>
+  </ul>
+</nav>

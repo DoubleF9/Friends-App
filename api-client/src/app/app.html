@@ -1,17 +1,8 @@
-<div class="container">
-  <header>
-    <h1>Welcome to the API Client App</h1>
-    <p>Please login or register to continue</p>
-  </header>
+<div class="app-container">
+
+  <app-navbar *ngIf="isLoggedIn"></app-navbar>
   
   <main>
-    <div class="card">
-      <div class="button-container">
-        <button routerLink="/login" class="btn btn-primary">Login</button>
-        <button routerLink="/register" class="btn btn-secondary">Register</button>
-      </div>
-    </div>
+    <router-outlet></router-outlet>
   </main>
-  
-  <router-outlet></router-outlet>
 </div>

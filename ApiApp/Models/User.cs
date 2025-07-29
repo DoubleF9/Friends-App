@@ -16,6 +16,6 @@ namespace ApiApp.Models
         public Profile? Profile { get; set; }
         public bool IsLogged { get; set; }
 
-
+        public ICollection<Friend> Friends { get; set; } = new List<Friend>();
     }
 }
