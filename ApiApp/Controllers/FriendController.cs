@@ -19,7 +19,6 @@ namespace ApiApp.Controllers
             _context = context;
         }
 
-        // Get all friends for the authenticated user with pagination
         [HttpGet]
         public async Task<Object> GetFriends([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
@@ -27,7 +26,6 @@ namespace ApiApp.Controllers
             if (userId <= 0)
                 return Unauthorized("Invalid user ID in token.");
 
-            // Get total count for pagination
             var totalCount = await _context.Friends
                 .Where(f => f.UserId == userId)
                 .CountAsync();

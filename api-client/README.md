@@ -1,59 +1,178 @@
-# ApiClient
+# API Client - Angular Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.0.
+A modern Angular application with ASP.NET Core backend featuring user authentication, profile management, and friends list functionality.
 
-## Development server
+## 🚀 Features
 
-To start a local development server, run:
+- **Identity System**: Secure user registration and login with JWT authentication
+- **User Profiles**: Customizable user profiles with personal information
+- **Friends Management**: Add, edit, delete, and search through your contacts
+- **Responsive Design**: Modern UI with Angular Material components
+- **Real-time Search**: Live search functionality for friends list
+- **Pagination**: Efficient data loading with paginated results
 
+## 🛠️ Tech Stack
+
+### Frontend
+- **Angular 20** - Modern web framework
+- **Angular Material** - UI component library
+- **TypeScript** - Type-safe JavaScript
+- **RxJS** - Reactive programming
+- **Angular Router** - Client-side routing
+- **JWT Authentication** - Secure token-based auth
+
+### Backend
+- **ASP.NET Core** - Web API backend
+- **Entity Framework Core** - Database ORM
+- **JWT Bearer Authentication** - Token-based security
+- **SQL Server** - Database
+
+## 📋 Prerequisites
+
+- **Node.js** v20.19+ or v22.12+ or v24.0+
+- **Angular CLI** v20+
+- **.NET SDK** (for backend)
+- **SQL Server** (for database)
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
 ```bash
+git clone <repository-url>
+cd api-client
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Set Up Node.js Version (if using NVM)
+```bash
+nvm use 22.18.0
+```
+
+### 4. Backend Setup
+Navigate to your ASP.NET Core backend project and:
+```bash
+# Restore packages
+dotnet restore
+
+# Update database with migrations
+dotnet ef database update
+
+# Run the backend API
+dotnet run
+```
+
+### 5. Start the Angular App
+```bash
+npm start
+# or
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The app will be available at `http://localhost:4200`
 
-## Code scaffolding
+## 🔧 Configuration
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### API Endpoint
+The Angular app connects to the backend at `http://localhost:5158`. Update the API base URL in the `ApiService` if your backend runs on a different port.
 
-```bash
-ng generate component component-name
+### Environment Variables
+Configure your environment settings in:
+- `src/environments/environment.ts` (development)
+- `src/environments/environment.prod.ts` (production)
+
+## 📱 Application Structure
+
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── login/          # Login form
+│   │   ├── register/       # Registration form
+│   │   ├── profile/        # User profile management
+│   │   ├── friends/        # Friends list with CRUD operations
+│   │   └── navbar/         # Navigation component
+│   ├── guards/
+│   │   └── auth-guard.ts   # Route protection
+│   ├── interceptors/
+│   │   └── auth-interceptor.ts  # JWT token handling
+│   ├── services/
+│   │   ├── auth.ts         # Authentication service
+│   │   └── api.ts          # API communication
+│   └── app.routes.ts       # Route configuration
+└── styles.css              # Global styles
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🔐 Authentication Flow
+
+1. **Registration**: Users create accounts with email/password
+2. **Login**: Secure authentication returns JWT token
+3. **Token Storage**: JWT stored in localStorage
+4. **Auto-logout**: Expired tokens automatically redirect to login
+5. **Route Protection**: AuthGuard protects authenticated routes
+
+## 👥 Friends Management
+
+- **Add Friends**: Create new contacts with name and phone
+- **Search**: Real-time search through friends list
+- **Edit**: Update friend information
+- **Delete**: Remove friends with confirmation
+- **Pagination**: Efficient browsing of large contact lists
+
+## 🎨 UI Features
+
+- **Modern Design**: Clean, professional interface
+- **Responsive Layout**: Works on desktop and mobile
+- **Loading States**: Visual feedback for async operations
+- **Error Handling**: User-friendly error messages
+- **Success Notifications**: Confirmation for completed actions
+
+## 📦 Available Scripts
 
 ```bash
-ng generate --help
+npm start          # Start development server
+npm run build      # Build for production
+npm test           # Run unit tests
+npm run watch      # Build in watch mode
 ```
 
-## Building
+## 🤝 Contributing
 
-To build the project run:
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Troubleshooting
+
+### Node.js Version Issues
+If you get Node.js version errors:
 ```bash
-ng build
+# Install correct version with NVM
+nvm install 22.18.0
+nvm use 22.18.0
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Backend Connection Issues
+- Ensure the ASP.NET Core API is running on `http://localhost:5158`
+- Check database migrations are applied
+- Verify CORS configuration in the backend
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
+### Database Issues
 ```bash
-ng test
+# In your .NET project
+dotnet ef migrations add InitialCreate
+dotnet ef database update
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Built with ❤️ using Angular and ASP.NET Core
