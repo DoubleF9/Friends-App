@@ -245,4 +245,7 @@ export class FriendsComponent implements OnInit {
     const end = Math.min(this.currentPage() * this.pageSize, this.totalCount());
     return `Showing ${start}-${end} of ${this.totalCount()} friends`;
   }
+  public get formIsVisible():boolean {
+    return this.showAddForm();
+  }
 }

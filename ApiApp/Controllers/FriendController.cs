@@ -25,39 +25,45 @@ namespace ApiApp.Controllers
             int userId = GetUserIdFromToken();
             if (userId <= 0)
                 return Unauthorized("Invalid user ID in token.");
-
-            var totalCount = await _context.Friends
-                .Where(f => f.UserId == userId)
-                .CountAsync();
-
-
-            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-            
-            page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
-
-
-            var friends = await _context.Friends
-                .Where(f => f.UserId == userId)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(f => new FriendDto
-                {
-                    Id = f.Id,
-                    FirstName = f.FirstName,
-                    LastName = f.LastName,
-                    PhoneNumber = f.PhoneNumber
-                })
-                .ToListAsync();
-
-
-            return new
+            try
             {
-                friends,
-                totalCount,
-                currentPage = page,
-                pageSize,
-                totalPages
-            };
+                var totalCount = await _context.Friends
+                    .Where(f => f.UserId == userId)
+                    .CountAsync();
+
+
+                var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+                page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
+
+
+                var friends = await _context.Friends
+                    .Where(f => f.UserId == userId)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(f => new FriendDto
+                    {
+                        Id = f.Id,
+                        FirstName = f.FirstName,
+                        LastName = f.LastName,
+                        PhoneNumber = f.PhoneNumber
+                    })
+                    .ToListAsync();
+
+
+                return new
+                {
+                    friends,
+                    totalCount,
+                    currentPage = page,
+                    pageSize,
+                    totalPages
+                };
+            }
+            catch(Exception ex)
+            {
+                return BadRequest( $"Internal server error: {ex.Message}");
+            }
         }
 
         // Get a specific friend by ID
@@ -145,6 +151,7 @@ namespace ApiApp.Controllers
 
             _context.Friends.Remove(friend);
             await _context.SaveChangesAsync();
+
             return Ok(new { message = "Friend deleted successfully" });
         }
 
@@ -155,6 +162,7 @@ namespace ApiApp.Controllers
             int userId = GetUserIdFromToken();
             if (userId <= 0)
                 return Unauthorized("Invalid user ID in token.");
+
 
 
             if (string.IsNullOrWhiteSpace(searchTerm))

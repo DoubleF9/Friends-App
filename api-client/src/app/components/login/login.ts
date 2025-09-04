@@ -36,15 +36,18 @@ export class Login {
     this.errorMessage = '';
 
     const { email, password } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
+    try { 
+      this.authService.login(email, password).subscribe({
       next: () => {
         this.router.navigate(['/profile']);
       },
       error: (error) => {
         this.errorMessage = error.error || 'Failed to login. Please try again.';
-        this.loading = false;
       }
     });
+  } catch (error) {
+      this.errorMessage = 'Error';
+      this.loading = false;
+    }
   }
 }

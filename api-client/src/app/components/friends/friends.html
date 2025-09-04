@@ -48,7 +48,7 @@
   </div>
 
   <!-- Add/Edit Friend Form -->
-  <div *ngIf="showAddForm()" class="add-friend-modal">
+  <div *ngIf="formIsVisible" class="add-friend-modal">
     <div class="modal-content">
       <div class="modal-header">
         <h3>{{ editingFriend() ? 'Edit Friend' : 'Add New Friend' }}</h3>
